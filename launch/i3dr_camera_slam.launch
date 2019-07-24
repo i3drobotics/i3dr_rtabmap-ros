@@ -12,6 +12,7 @@
     <!-- STEREO REGISTRATOIN -->
     <include file="$(find i3dr_rtabmap)/launch/stereo_localisation.launch">
         <arg name="localization" value="$(arg localization)"/>
+        <arg name="camera_name" value="$(arg camera_name)"/>
         <arg name="camera_namespace" value="$(arg camera_name)"/>
         <arg name="depth_odom" value="true"/>
         <!--<arg name="scan3d_odom" value="true"/>-->

@@ -1,6 +1,7 @@
 <launch>
     
     <arg name="camera_namespace" default="stereo"/>
+    <arg name="camera_name" default="stereo"/>
     <arg name="depth_odom" default="false"/>
     <arg name="stereo_odom" default="false"/>
     <arg name="icp_odom" default="false"/>
@@ -35,7 +36,7 @@
 
     <!-- SLAM -->
     <include if="$(eval true)" file="$(find i3dr_rtabmap)/launch/rtabmap.launch">
-        <arg name="namespace" value="$(arg camera_namespace)"/>
+        <arg name="namespace" value="$(arg camera_name)"/>
         <arg unless="$(arg localization)" name="args" value="--delete_db_on_start"/>
         <arg name="frame_id" value="$(arg base_link_frame)"/>
 
