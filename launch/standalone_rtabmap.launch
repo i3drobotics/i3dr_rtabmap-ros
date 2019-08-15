@@ -5,15 +5,12 @@
     <arg name="localization" default="false"/>
 
     <node pkg="nodelet" type="nodelet" name="i3dr_disparity2depth_laser" args="standalone rtabmap_ros/disparity_to_depth">
-        <remap if="$(arg split_laser)" from="depth" to="/$(arg camera_name)/non_laser/depth" />
-        <remap unless="$(arg split_laser)" from="depth" to="/$(arg camera_name)/depth" />
-        <remap if="$(arg split_laser)" from="depth_raw" to="/$(arg camera_name)/non_laser/depth_raw" />
-        <remap unless="$(arg split_laser)" from="depth_raw" to="/$(arg camera_name)/depth_raw" />
-        <remap if="$(arg split_laser)" from="disparity" to="/$(arg camera_name)/with_laser/disparity" />
-        <remap unless="$(arg split_laser)" from="disparity" to="/$(arg camera_name)/disparity" />
+        <remap from="depth" to="/$(arg camera_name)/depth" />
+        <remap from="depth_raw" to="/$(arg camera_name)/depth_raw" />
+        <remap from="disparity" to="/$(arg camera_name)/disparity" />
     </node>
 
-<!-- STEREO REGISTRATOIN -->
+    <!-- STEREO REGISTRATOIN -->
     <include file="$(find i3dr_rtabmap)/launch/stereo_localisation.launch">
         <arg name="localization" value="$(arg localization)"/>
 
@@ -24,17 +21,14 @@
         <arg name="depth_odom" value="true"/>
         <arg name="disparity2Depth" default="false"/>
 
-        <arg if="$(arg split_laser)" name="rgb_topic" value="/$(arg camera_name)/non_laser/left/image_rect"/>
+        <arg if="$(arg split_laser)" name="rgb_topic" value="/$(arg camera_name)/left/image_rect_no_laser"/>
         <arg unless="$(arg split_laser)" name="rgb_topic" value="/$(arg camera_name)/left/image_rect"/>
 
-        <arg if="$(arg split_laser)" name="camera_info_topic" value="/$(arg camera_name)/non_laser/left/camera_info"/>
-        <arg unless="$(arg split_laser)" name="camera_info_topic" value="/$(arg camera_name)/left/camera_info"/>
+        <arg name="camera_info_topic" value="/$(arg camera_name)/left/camera_info"/>
 
-        <arg if="$(arg split_laser)" name="depth_topic" value="/$(arg camera_name)/non_laser/depth"/>
-        <arg unless="$(arg split_laser)" name="depth_topic" value="/$(arg camera_name)/depth"/>
+        <arg name="depth_topic" value="/$(arg camera_name)/depth"/>
     
-        <arg if="$(arg split_laser)" name="depth_camera_info_topic" value="/$(arg camera_name)/with_laser/left/camera_info"/>
-        <arg unless="$(arg split_laser)" name="depth_camera_info_topic" value="/$(arg camera_name)/left/camera_info"/>
+        <arg name="depth_camera_info_topic" value="/$(arg camera_name)/left/camera_info"/>
 
         <!--
         <arg if="$(arg split_laser)" name="cloud_topic" value="/$(arg camera_name)/with_laser/points2"/>
