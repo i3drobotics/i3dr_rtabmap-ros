@@ -1,25 +1,16 @@
 <launch>
 
-    <arg name="camera_name" default="phobos_nuclear"/>
+    <arg name="camera_namepace" default="phobos_nuclear"/>
     <arg name="split_laser" default="false"/>
     <arg name="localization" default="false"/>
-
-    <node pkg="nodelet" type="nodelet" name="i3dr_disparity2depth_laser" args="standalone rtabmap_ros/disparity_to_depth">
-        <remap from="depth" to="/$(arg camera_name)/depth" />
-        <remap from="depth_raw" to="/$(arg camera_name)/depth_raw" />
-        <remap from="disparity" to="/$(arg camera_name)/disparity" />
-    </node>
 
     <!-- STEREO REGISTRATOIN -->
     <include file="$(find i3dr_rtabmap)/launch/stereo_localisation.launch">
         <arg name="localization" value="$(arg localization)"/>
 
-        <arg if="$(arg split_laser)" name="camera_namespace" value="$(arg camera_name)/non_laser"/>
-        <arg unless="$(arg split_laser)" name="camera_namespace" value="$(arg camera_name)"/>
+        <arg name="camera_namespace" value="$(arg camera_namepace)"/>
 
-        <arg name="camera_name" value="$(arg camera_name)"/>
         <arg name="depth_odom" value="true"/>
-        <arg name="disparity2Depth" default="false"/>
 
         <arg if="$(arg split_laser)" name="rgb_topic" value="/$(arg camera_name)/left/image_rect_no_laser"/>
         <arg unless="$(arg split_laser)" name="rgb_topic" value="/$(arg camera_name)/left/image_rect"/>
@@ -29,11 +20,6 @@
         <arg name="depth_topic" value="/$(arg camera_name)/depth"/>
     
         <arg name="depth_camera_info_topic" value="/$(arg camera_name)/left/camera_info"/>
-
-        <!--
-        <arg if="$(arg split_laser)" name="cloud_topic" value="/$(arg camera_name)/with_laser/points2"/>
-        <arg unless="$(arg split_laser)" name="cloud_topic" value="/$(arg camera_name)/points2"/>
-        -->
 
         <arg name="base_link_frame" value="$(arg camera_name)_base_link"/>
         <!-- should be set to true if using SGBM or Phobos/Phobos_nuclear as these takes longer to process -->

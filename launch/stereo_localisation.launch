@@ -1,96 +1,63 @@
 <launch>
-    
-    <arg name="camera_namespace" default="stereo"/>
-    <arg name="camera_name" default="stereo"/>
-    <arg name="depth_odom" default="false"/>
-    <arg name="stereo_odom" default="false"/>
-    <arg name="icp_odom" default="false"/>
-    <arg name="depth_icp_odom" default="false"/>
-    <arg name="disparity2Depth" default="false"/>
-    <arg name="madgwick" default="false"/>
-    <arg name="ukf" default="false"/>
-    <arg name="base_link_frame" default="$(arg camera_namespace)_base_link"/>
-    <arg name="rgb_topic" default="/$(arg camera_namespace)/color/image_raw"/>
-    <arg name="camera_info_topic" default="/$(arg camera_namespace)/color/camera_info"/>
-    <arg name="depth_topic" default="/$(arg camera_namespace)/depth"/>
-    <arg name="depth_camera_info_topic" default="/$(arg camera_namespace)/depth/camera_info"/>
-    <arg name="cloud_topic" default="/$(arg camera_namespace)/points2"/>
+    <arg name="stereo_namespace" default="stereo" />
+    <arg name="urdf_namespace" default="namespace"/>
     <arg name="slow_processing" default="false"/>
-    <arg name="localization" default="false"/>
-    <arg name="imu_topic" default="/imu/data"/>
+    <arg name="split_laser" default="false"/>
+    <arg name="localization" default="false"/> <!-- TODO allow switch to localisation -->
+    <arg name="imu" default="false"/>
+    <arg name="rviz" default="false"/>
 
-    <arg name="sub_cloud" default="$(eval icp_odom or depth_icp_odom)"/>
+    <!-- DISPLAY -->
+    <!-- run rviz with config file -->
+    <node if="$(arg rviz)" pkg="rviz" type="rviz" name="rivz" 
+        args="-d $(find i3dr_rtabmap)/rviz/stereo_localisation.rviz"/>
 
-    <!-- Convert disparity to depth -->
-    <group ns="$(arg camera_namespace)">
-        <node if="$(arg disparity2Depth)" pkg="nodelet" type="nodelet" name="disparity2depth" args="standalone rtabmap_ros/disparity_to_depth"/>
-    </group>
-
-    <!-- madgwick imu filter -->
-    <node if="$(arg madgwick)" pkg="imu_filter_madgwick" type="imu_filter_node" name="ImuFilter">
-        <param name="use_mag" type="bool" value="false" />
-        <param name="publish_tf" type="bool" value="false" />
-        <param name="publish_debug_topics" type="bool" value="true"/>
-        <remap from="/imu/data_raw" to="/$(arg camera_namespace)/imu"/>
-    </node>
-
-    <!-- SLAM -->
-    <include if="$(eval true)" file="$(find i3dr_rtabmap)/launch/rtabmap.launch">
-        <arg name="namespace" value="$(arg camera_name)"/>
-        <arg unless="$(arg localization)" name="args" value="--delete_db_on_start"/>
-        <arg name="frame_id" value="$(arg base_link_frame)"/>
-
-        <arg name="localization" value="$(arg localization)"/>
-
-        <arg name="stereo_odometry" value="$(arg stereo_odom)"/>
-        <arg name="icp_odometry" value="$(arg icp_odom)"/>
-        <arg name="visual_odometry" value="$(arg depth_odom)"/>
-        <arg name="icp_rgbd_odometry" value="$(arg depth_icp_odom)"/>
-
-        <arg name="depth_topic" value="$(arg depth_topic)"/>
-        <arg name="rgb_topic" value="$(arg rgb_topic)"/>
-        <arg name="camera_info_topic" value="$(arg camera_info_topic)"/>
-        <arg name="depth_camera_info_topic" value="$(arg depth_camera_info_topic)"/>
-        <arg name="scan_cloud_topic" value="$(arg cloud_topic)"/>
-        <arg name="subscribe_scan_cloud" value="$(arg sub_cloud)"/>
-
-        <arg name="stereo_namespace" value="/$(arg camera_namespace)"/>
-        <arg name="approx_sync" value="true"/>
-
-        <arg unless="$(arg slow_processing)" name="queue_size" value="20"/>
-        <arg unless="$(arg slow_processing)" name="wait_for_transform" value="0.2"/>   
-        <arg if="$(arg slow_processing)" name="queue_size" value="20"/>
-        <arg if="$(arg slow_processing)" name="wait_for_transform" value="1.0"/>     
-
-        <arg name="rtabmapviz" value="true"/>
+    <include file="$(find rtabmap_ros)/launch/rtabmap.launch">
+        <arg name="args" value="--delete_db_on_start"/>
+        <arg name="frame_id" value="$(arg urdf_namespace)_base_link"/>
+        <arg unless="$(arg split_laser)" name="rgb_topic" value="/$(arg stereo_namespace)/left/image_rect"/>
+        <arg if="$(arg split_laser)" name="rgb_topic" value="/$(arg camera_namespace)/left/image_rect_no_laser"/>
+        <arg name="depth_topic" value="/$(arg stereo_namespace)/depth"/>
+        <arg name="camera_info_topic" value="/$(arg stereo_namespace)/left/camera_info"/>
+        <arg name="depth_camera_info_topic" value="/$(arg stereo_namespace)/left/camera_info"/>
+        <arg name="rtabmapviz" value="false"/>
         <arg name="rviz" value="false"/>
     </include>
-    .
 
-    <include if="$(arg ukf)" file="$(find robot_localization)/launch/ukf_template.launch">
-        <param name="/ukf_se/frequency" value="140"/>
-        <param name="/ukf_se/base_link_frame" value="$(arg base_link_frame)"/>
-        <param name="/ukf_se/odom0" value="rtabmap/odom"/>
-        <rosparam param="/ukf_se/odom0_config">[true,true,true,
-                                                true,true,true,
-                                                true,true,true,
-                                                true,true,true,
-                                                true,true,true]
-        </rosparam>
-        <param name="/ukf_se/odom0_relative" value="true"/>
-        <param name="/ukf_se/odom0_pose_rejection_threshold" value="10000000"/>
-        <param name="/ukf_se/odom0_twist_rejection_threshold" value="10000000"/>
+    <group if="$(arg imu)">
+        <!-- madgwick imu filter -->
+        <node pkg="imu_filter_madgwick" type="imu_filter_node" name="ImuFilter">
+            <param name="_use_ma" type="bool" value="false" />
+            <param name="_publish_tf" type="bool" value="false" />
+            <param name="_world_frame" type="string" value="enu" />
+            <remap from="/imu/data_raw" to="/$(arg stereo_namespace)/imu"/>
+        </node>
 
-        <param name="/ukf_se/imu0" value="/imu/data"/>
-        <rosparam param="/ukf_se/imu0_config">[false, false, false,
-                                            true,  true,  true,
-                                            true,  true,  true,
-                                            true,  true,  true,
-                                            true,  true,  true]
-        </rosparam>
-        <param name="/ukf_se/imu0_differential" value="true"/>
-        <param name="/ukf_se/imu0_relative" value="false"/>
-        <param name="/ukf_se/use_control" value="false"/>
-    </include>
+        <include if="$(arg ukf)" file="$(find robot_localization)/launch/ukf_template.launch">
+            <param name="/ukf_se/frequency" value="140"/>
+            <param name="/ukf_se/base_link_frame" value="$(arg urdf_namespace)_base_link"/>
+            <param name="/ukf_se/odom0" value="rtabmap/odom"/>
+            <rosparam param="/ukf_se/odom0_config">[true,true,true,
+                                                    true,true,true,
+                                                    true,true,true,
+                                                    true,true,true,
+                                                    true,true,true]
+            </rosparam>
+            <param name="/ukf_se/odom0_relative" value="true"/>
+            <param name="/ukf_se/odom0_pose_rejection_threshold" value="10000000"/>
+            <param name="/ukf_se/odom0_twist_rejection_threshold" value="10000000"/>
+
+            <param name="/ukf_se/imu0" value="/imu/data"/>
+            <rosparam param="/ukf_se/imu0_config">[false, false, false,
+                                                true,  true,  true,
+                                                true,  true,  true,
+                                                true,  true,  true,
+                                                true,  true,  true]
+            </rosparam>
+            <param name="/ukf_se/imu0_differential" value="true"/>
+            <param name="/ukf_se/imu0_relative" value="false"/>
+            <param name="/ukf_se/use_control" value="false"/>
+        </include>
+    </group>
   
 </launch>
