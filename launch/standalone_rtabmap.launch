@@ -1,29 +1,32 @@
 <launch>
 
-    <arg name="camera_namepace" default="phobos_nuclear"/>
+    <arg name="camera_namespace" default="deimos"/>
+    <arg name="camera_model" default="$(arg camera_namespace)"/>
     <arg name="split_laser" default="false"/>
     <arg name="localization" default="false"/>
+    <arg name="offline" default="true"/>
+    <arg name="rviz" default="false"/>
 
+    <group unless="$(arg offline)">
+        <arg name="package" value="i3dr_$(arg camera_model)"/>
+        <arg name="camera_launch_file" value="$(eval find(arg('package')) + '/launch/' + arg('camera_model') + '.launch')"/>
+
+        <include file="$(arg camera_launch_file)">
+        </include>
+    </group>
+
+    <!-- rviz for debugging -->
+    <node if="$(arg rviz)" pkg="rviz" type="rviz" name="rivz" args="-d $(find i3dr_rtabmap)/config/test_mapping_$(arg camera_model).rviz"/>
+    
     <!-- STEREO REGISTRATOIN -->
     <include file="$(find i3dr_rtabmap)/launch/stereo_localisation.launch">
-        <arg name="localization" value="$(arg localization)"/>
-
-        <arg name="camera_namespace" value="$(arg camera_namepace)"/>
-
-        <arg name="depth_odom" value="true"/>
-
-        <arg if="$(arg split_laser)" name="rgb_topic" value="/$(arg camera_name)/left/image_rect_no_laser"/>
-        <arg unless="$(arg split_laser)" name="rgb_topic" value="/$(arg camera_name)/left/image_rect"/>
-
-        <arg name="camera_info_topic" value="/$(arg camera_name)/left/camera_info"/>
-
-        <arg name="depth_topic" value="/$(arg camera_name)/depth"/>
-    
-        <arg name="depth_camera_info_topic" value="/$(arg camera_name)/left/camera_info"/>
-
-        <arg name="base_link_frame" value="$(arg camera_name)_base_link"/>
-        <!-- should be set to true if using SGBM or Phobos/Phobos_nuclear as these takes longer to process -->
-        <arg name="slow_processing" default="true"/>
+        <arg name="stereo_namespace" value="$(arg camera_namespace)" />
+        <arg name="urdf_namespace" value="$(arg camera_model)"/>
+        <arg name="slow_processing" value="false"/> <!-- should be set to true if using SGBM or Phobos/Phobos_nuclear as these takes longer to process -->
+        <arg if="$(eval camera_model=='deimos')" name="split_laser" value="false"/>
+        <arg if="$(eval camera_model=='phobos_nuclear')" name="split_laser" value="true"/>
+        <arg name="localization" value="false"/> <!-- TODO allow switch to localisation -->
+        <arg name="rviz" value="false"/>
     </include>
 
 </launch>
