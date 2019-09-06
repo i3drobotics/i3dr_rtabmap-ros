@@ -1,26 +1,46 @@
 <launch>
-    <arg name="stereo_namespace" default="stereo" />
-    <arg name="urdf_namespace" default="namespace"/>
+    <arg name="camera_namespace" default="stereo" />
+    <arg name="camera_model" default="$(arg camera_namespace)"/>
     <arg name="slow_processing" default="false"/>
     <arg name="split_laser" default="false"/>
     <arg name="localization" default="false"/> <!-- TODO allow switch to localisation -->
     <arg name="imu" default="false"/>
     <arg name="rviz" default="false"/>
+    <arg name="rtabmapviz" default="false"/>
+
+    <arg name="custom_rtabmap" default="true"/>
 
     <!-- DISPLAY -->
     <!-- run rviz with config file -->
     <node if="$(arg rviz)" pkg="rviz" type="rviz" name="rivz" 
         args="-d $(find i3dr_rtabmap)/rviz/stereo_localisation.rviz"/>
 
-    <include file="$(find rtabmap_ros)/launch/rtabmap.launch">
+    <include if="$(arg custom_rtabmap)" file="$(find i3dr_rtabmap)/launch/rtabmap_custom.launch">
         <arg name="args" value="--delete_db_on_start"/>
-        <arg name="frame_id" value="$(arg urdf_namespace)_base_link"/>
-        <arg unless="$(arg split_laser)" name="rgb_topic" value="/$(arg stereo_namespace)/left/image_rect"/>
-        <arg if="$(arg split_laser)" name="rgb_topic" value="/$(arg stereo_namespace)/left/image_rect_no_laser"/>
-        <arg name="depth_topic" value="/$(arg stereo_namespace)/depth"/>
-        <arg name="camera_info_topic" value="/$(arg stereo_namespace)/left/camera_info"/>
-        <arg name="depth_camera_info_topic" value="/$(arg stereo_namespace)/left/camera_info"/>
-        <arg name="rtabmapviz" value="false"/>
+        <arg name="frame_id" value="$(arg camera_model)_base_link"/>
+        <!--<arg name="frame_id" value="base_link"/>-->
+        <arg unless="$(arg split_laser)" name="rgb_topic" value="/$(arg camera_namespace)/left/image_rect"/>
+        <arg if="$(arg split_laser)" name="rgb_topic" value="/$(arg camera_namespace)/left/image_rect_no_laser"/>
+        <arg name="depth_topic" value="/$(arg camera_namespace)/depth"/>
+        <arg name="camera_info_topic" value="/$(arg camera_namespace)/left/camera_info"/>
+        <arg name="depth_camera_info_topic" value="/$(arg camera_namespace)/left/camera_info"/>
+        <arg name="rtabmapviz" value="$(arg rtabmapviz)"/>
+        <arg name="rviz" value="false"/>
+
+        <arg name="queue_size" value="50"/>
+        <arg name="approx_sync" value="true"/>
+        <arg name="wait_for_transform" value="5"/>
+    </include>
+
+    <include unless="$(arg custom_rtabmap)" file="$(find rtabmap_ros)/launch/rtabmap.launch">
+        <arg name="args" value="--delete_db_on_start"/>
+        <arg name="frame_id" value="$(arg camera_model)_base_link"/>
+        <arg unless="$(arg split_laser)" name="rgb_topic" value="/$(arg camera_namespace)/left/image_rect"/>
+        <arg if="$(arg split_laser)" name="rgb_topic" value="/$(arg camera_namespace)/left/image_rect_no_laser"/>
+        <arg name="depth_topic" value="/$(arg camera_namespace)/depth"/>
+        <arg name="camera_info_topic" value="/$(arg camera_namespace)/left/camera_info"/>
+        <arg name="depth_camera_info_topic" value="/$(arg camera_namespace)/left/camera_info"/>
+        <arg name="rtabmapviz" value="$(arg rtabmapviz)"/>
         <arg name="rviz" value="false"/>
     </include>
 
@@ -30,12 +50,12 @@
             <param name="_use_ma" type="bool" value="false" />
             <param name="_publish_tf" type="bool" value="false" />
             <param name="_world_frame" type="string" value="enu" />
-            <remap from="/imu/data_raw" to="/$(arg stereo_namespace)/imu"/>
+            <remap from="/imu/data_raw" to="/$(arg camera_namespace)/imu"/>
         </node>
 
         <include if="$(arg ukf)" file="$(find robot_localization)/launch/ukf_template.launch">
             <param name="/ukf_se/frequency" value="140"/>
-            <param name="/ukf_se/base_link_frame" value="$(arg urdf_namespace)_base_link"/>
+            <param name="/ukf_se/base_link_frame" value="$(arg camera_model)_base_link"/>
             <param name="/ukf_se/odom0" value="rtabmap/odom"/>
             <rosparam param="/ukf_se/odom0_config">[true,true,true,
                                                     true,true,true,

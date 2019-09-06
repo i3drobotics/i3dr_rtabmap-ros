@@ -1,10 +1,10 @@
 <launch>
 
-    <arg name="camera_namespace" default="deimos"/>
+    <arg name="camera_namespace" default="phobos_nuclear"/> <!-- deimos/phobos_nuclear -->
     <arg name="camera_model" default="$(arg camera_namespace)"/>
-    <arg name="split_laser" default="false"/>
+    <arg name="split_laser" default="true"/> <!-- true/false -->
     <arg name="localization" default="false"/>
-    <arg name="offline" default="true"/>
+    <arg name="offline" default="true"/> <!-- true/false -->
     <arg name="rviz" default="false"/>
 
     <group unless="$(arg offline)">
@@ -12,6 +12,8 @@
         <arg name="camera_launch_file" value="$(eval find(arg('package')) + '/launch/' + arg('camera_model') + '.launch')"/>
 
         <include file="$(arg camera_launch_file)">
+            <arg name="camera_namespace" value="$(arg camera_namespace)"/>
+            <arg name="camera_model" value="$(arg camera_model)"/>
         </include>
     </group>
 
@@ -20,13 +22,13 @@
     
     <!-- STEREO REGISTRATOIN -->
     <include file="$(find i3dr_rtabmap)/launch/stereo_localisation.launch">
-        <arg name="stereo_namespace" value="$(arg camera_namespace)" />
-        <arg name="urdf_namespace" value="$(arg camera_model)"/>
+        <arg name="camera_namespace" value="$(arg camera_namespace)" />
+        <arg name="camera_model" value="$(arg camera_model)"/>
         <arg name="slow_processing" value="false"/> <!-- should be set to true if using SGBM or Phobos/Phobos_nuclear as these takes longer to process -->
-        <arg if="$(eval camera_model=='deimos')" name="split_laser" value="false"/>
-        <arg if="$(eval camera_model=='phobos_nuclear')" name="split_laser" value="true"/>
+        <arg name="split_laser" value="$(arg split_laser)"/>
         <arg name="localization" value="false"/> <!-- TODO allow switch to localisation -->
         <arg name="rviz" value="false"/>
+        <arg name="rtabmapviz" value="true"/>
     </include>
 
 </launch>
