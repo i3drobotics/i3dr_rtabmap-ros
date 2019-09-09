@@ -1,34 +1,55 @@
 <launch>
 
-    <arg name="camera_namespace" default="phobos_nuclear"/> <!-- deimos/phobos_nuclear -->
-    <arg name="camera_model" default="$(arg camera_namespace)"/>
-    <arg name="split_laser" default="true"/> <!-- true/false -->
-    <arg name="localization" default="false"/>
-    <arg name="offline" default="true"/> <!-- true/false -->
-    <arg name="rviz" default="false"/>
+  <arg name="camera_namespace" default="phobos_nuclear"/>
+  <!-- deimos/phobos_nuclear -->
+  <arg name="camera_model" default="$(arg camera_namespace)"/>
+  <arg name="urdf_namespace" default="$(arg camera_namespace)"/>
+  <arg name="split_laser" default="true"/>
+  <arg name="map_frame_id" default="map"/>
 
-    <group unless="$(arg offline)">
-        <arg name="package" value="i3dr_$(arg camera_model)"/>
-        <arg name="camera_launch_file" value="$(eval find(arg('package')) + '/launch/' + arg('camera_model') + '.launch')"/>
+  <arg name="gftt_min_dist" default="5"/>
+  <arg name="max_depth" default="3"/>
+  <!-- true/false -->
+  <arg name="localization" default="false"/>
+  <arg name="camera_en" default="false"/>
+  <!-- true/false -->
+  <arg name="rviz" default="false"/>
 
-        <include file="$(arg camera_launch_file)">
-            <arg name="camera_namespace" value="$(arg camera_namespace)"/>
-            <arg name="camera_model" value="$(arg camera_model)"/>
-        </include>
-    </group>
+  <arg if="$(arg camera_en)" name="package" value="i3dr_$(arg camera_model)"/>
+  <arg if="$(arg camera_en)" name="cameraLeft_info_url" default="$(eval 'file://' + find(arg('package')) + '/calibration/' + arg('camera_model') + '_left.yaml')" doc="Calibration file for left camera (Only used in offline mode)"/>
+  <arg if="$(arg camera_en)" name="cameraRight_info_url" default="$(eval 'file://' + find(arg('package')) + '/calibration/' + arg('camera_model') + '_right.yaml')" doc="Calibration file for left camera (Only used in offline mode)"/>
 
-    <!-- rviz for debugging -->
-    <node if="$(arg rviz)" pkg="rviz" type="rviz" name="rivz" args="-d $(find i3dr_rtabmap)/config/test_mapping_$(arg camera_model).rviz"/>
-    
-    <!-- STEREO REGISTRATOIN -->
-    <include file="$(find i3dr_rtabmap)/launch/stereo_localisation.launch">
-        <arg name="camera_namespace" value="$(arg camera_namespace)" />
-        <arg name="camera_model" value="$(arg camera_model)"/>
-        <arg name="slow_processing" value="false"/> <!-- should be set to true if using SGBM or Phobos/Phobos_nuclear as these takes longer to process -->
-        <arg name="split_laser" value="$(arg split_laser)"/>
-        <arg name="localization" value="false"/> <!-- TODO allow switch to localisation -->
-        <arg name="rviz" value="false"/>
-        <arg name="rtabmapviz" value="true"/>
+  <group if="$(arg camera_en)">
+    <arg name="camera_launch_file" value="$(eval find(arg('package')) + '/launch/' + arg('camera_model') + '.launch')"/>
+
+    <include file="$(arg camera_launch_file)">
+      <arg name="camera_namespace" value="$(arg camera_namespace)"/>
+      <arg name="camera_model" value="$(arg camera_model)"/>
+      <arg name="urdf_namespace" value="$(arg urdf_namespace)"/>
+      <arg name="cameraLeft_info_url" value="$(arg cameraLeft_info_url)" />
+      <arg name="cameraRight_info_url" value="$(arg cameraRight_info_url)" />
     </include>
+  </group>
+
+  <!-- rviz for debugging -->
+  <node if="$(arg rviz)" pkg="rviz" type="rviz" name="rivz" args="-d $(find i3dr_rtabmap)/config/test_mapping_$(arg camera_model).rviz"/>
+
+  <!-- STEREO REGISTRATOIN -->
+  <include file="$(find i3dr_rtabmap)/launch/stereo_localisation.launch">
+    <arg name="camera_namespace" value="$(arg camera_namespace)" />
+    <arg name="camera_model" value="$(arg camera_model)"/>
+    <arg name="urdf_namespace" value="$(arg urdf_namespace)"/>
+    <arg name="slow_processing" value="false"/>
+    <arg name="custom_rtabmap" value="true"/>
+    <arg name="max_depth" value="$(arg max_depth)"/>
+    <arg name="gftt_min_dist" value="$(arg gftt_min_dist)"/>
+    <arg name="map_frame_id" value="$(arg map_frame_id)"/>
+    <!-- should be set to true if using SGBM or Phobos/Phobos_nuclear as these takes longer to process -->
+    <arg name="split_laser" value="$(arg split_laser)"/>
+    <arg name="localization" value="false"/>
+    <!-- TODO allow switch to localisation -->
+    <arg name="rviz" value="false"/>
+    <arg name="rtabmapviz" value="true"/>
+  </include>
 
 </launch>
