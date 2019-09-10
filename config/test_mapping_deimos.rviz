@@ -139,9 +139,9 @@ Visualization Manager:
           Value: true
         i3dr_stereo_probe_mount:
           Value: true
-        odom:
+        map:
           Value: true
-        scan:
+        odom:
           Value: true
       Marker Scale: 0.300000012
       Name: TF
@@ -149,7 +149,7 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        scan:
+        map:
           odom:
             i3dr_stereo_base_link:
               i3dr_stereo_center:
@@ -334,17 +334,17 @@ Visualization Manager:
       Max. Octree Depth: 16
       Min. Height Display: -3.40282347e+38
       Name: ColorOccupancyGrid
-      Octomap Topic: /octomap_full
+      Octomap Topic: /octomap_binary
       Queue Size: 5
       Value: true
       Voxel Alpha: 1
-      Voxel Coloring: Z-Axis
+      Voxel Coloring: Cell Probability
       Voxel Rendering: Occupied Voxels
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: scan
+    Fixed Frame: map
     Frame Rate: 30
   Name: root
   Tools:
@@ -365,25 +365,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 2.86473012
+      Distance: 5.70608521
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.11046496
-        Y: -1.23964
-        Z: -0.017104011
+        X: -0.473534584
+        Y: -1.58309209
+        Z: 0.468494833
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.265397578
+      Pitch: 0.375397533
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.60539067
+      Yaw: 1.48039365
     Saved: ~
 Window Geometry:
   Depth:
