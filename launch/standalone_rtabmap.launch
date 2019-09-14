@@ -16,6 +16,8 @@
   <!-- true/false -->
   <arg name="rviz" default="false"/>
 
+  <arg name="use_compressed" default="false"/>
+
   <arg if="$(arg camera_en)" name="package" value="i3dr_$(arg camera_model)"/>
   <arg if="$(arg camera_en)" name="cameraLeft_info_url" default="$(eval 'file://' + find(arg('package')) + '/calibration/' + arg('camera_model') + '_left.yaml')" doc="Calibration file for left camera (Only used in offline mode)"/>
   <arg if="$(arg camera_en)" name="cameraRight_info_url" default="$(eval 'file://' + find(arg('package')) + '/calibration/' + arg('camera_model') + '_right.yaml')" doc="Calibration file for left camera (Only used in offline mode)"/>
@@ -46,6 +48,8 @@
     <arg name="gftt_min_dist" value="$(arg gftt_min_dist)"/>
     <arg name="map_frame_id" value="$(arg map_frame_id)"/>
     <arg name="grid_size" value="$(arg grid_size)"/>
+    <arg name="node_output" value="screen"/>
+    <arg name="use_compressed" value="$(arg use_compressed)"/>
     <!-- should be set to true if using SGBM or Phobos/Phobos_nuclear as these takes longer to process -->
     <arg name="split_laser" value="$(arg split_laser)"/>
     <arg name="localization" value="false"/>

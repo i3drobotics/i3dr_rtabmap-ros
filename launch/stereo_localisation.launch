@@ -13,8 +13,14 @@
     <arg name="node_output" default="log"/>
     <arg name="map_frame_id" default="map"/>
     <arg name="grid_size" default="0.05"/>
+    <arg name="use_compressed" default="false"/>
 
     <arg name="custom_rtabmap" default="false"/>
+
+    <arg if="$(arg use_compressed)" name="no_use_compressed" value="false" />
+    <arg unless="$(arg use_compressed)" name="no_use_compressed" value="true" />
+    <arg if="$(arg split_laser)" name="no_split_laser" value="false" />
+    <arg unless="$(arg split_laser)" name="no_split_laser" value="true" />
 
     <!-- DISPLAY -->
     <!-- run rviz with config file -->
@@ -26,8 +32,10 @@
         <arg name="frame_id" value="$(arg urdf_namespace)_base_link"/>
         <arg name="map_frame_id" value="$(arg map_frame_id)"/>
         <!--<arg name="frame_id" value="base_link"/>-->
-        <arg unless="$(arg split_laser)" name="rgb_topic" value="/$(arg camera_namespace)/left/image_rect"/>
-        <arg if="$(arg split_laser)" name="rgb_topic" value="/$(arg camera_namespace)/left/image_rect_no_laser"/>
+        <arg if="$(eval arg('no_split_laser') and arg('no_use_compressed'))" name="rgb_topic" value="/$(arg camera_namespace)/left/image_rect"/>
+        <arg if="$(eval arg('split_laser') and arg('no_use_compressed'))" name="rgb_topic" value="/$(arg camera_namespace)/left/image_rect_no_laser"/>
+        <arg if="$(eval arg('no_split_laser') and arg('use_compressed'))" name="rgb_topic" value="/$(arg camera_namespace)/left/image_rect/compressed"/>
+        <arg if="$(eval arg('split_laser') and arg('use_compressed'))" name="rgb_topic" value="/$(arg camera_namespace)/left/image_rect_no_laser/compressed"/>
         <arg name="depth_topic" value="/$(arg camera_namespace)/depth"/>
         <arg name="camera_info_topic" value="/$(arg camera_namespace)/left/camera_info"/>
         <arg name="depth_camera_info_topic" value="/$(arg camera_namespace)/left/camera_info"/>
