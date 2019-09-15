@@ -32,19 +32,20 @@
         <arg name="frame_id" value="$(arg urdf_namespace)_base_link"/>
         <arg name="map_frame_id" value="$(arg map_frame_id)"/>
         <!--<arg name="frame_id" value="base_link"/>-->
-        <arg if="$(eval arg('no_split_laser') and arg('no_use_compressed'))" name="rgb_topic" value="/$(arg camera_namespace)/left/image_rect"/>
-        <arg if="$(eval arg('split_laser') and arg('no_use_compressed'))" name="rgb_topic" value="/$(arg camera_namespace)/left/image_rect_no_laser"/>
-        <arg if="$(eval arg('no_split_laser') and arg('use_compressed'))" name="rgb_topic" value="/$(arg camera_namespace)/left/image_rect/compressed"/>
-        <arg if="$(eval arg('split_laser') and arg('use_compressed'))" name="rgb_topic" value="/$(arg camera_namespace)/left/image_rect_no_laser/compressed"/>
+        <arg if="$(eval arg('no_split_laser'))" name="rgb_topic" value="/$(arg camera_namespace)/left/image_rect"/>
+        <arg if="$(eval arg('split_laser'))" name="rgb_topic" value="/$(arg camera_namespace)/left/image_rect_no_laser"/>
+        <!--<arg if="$(eval arg('no_split_laser'))" name="rgb_topic" value="/$(arg camera_namespace)/left/image_rect/compressed"/>
+        <arg if="$(eval arg('split_laser'))" name="rgb_topic" value="/$(arg camera_namespace)/left/image_rect_no_laser/compressed"/>-->
         <arg name="depth_topic" value="/$(arg camera_namespace)/depth"/>
         <arg name="camera_info_topic" value="/$(arg camera_namespace)/left/camera_info"/>
+        <arg name="use_compressed" value="$(arg use_compressed)"/>
         <arg name="depth_camera_info_topic" value="/$(arg camera_namespace)/left/camera_info"/>
         <arg name="rtabmapviz" value="$(arg rtabmapviz)"/>
         <arg name="rviz" value="false"/>
 
-        <arg name="queue_size" value="20"/>
+        <arg name="queue_size" value="50"/>
         <arg name="approx_sync" value="true"/>
-        <arg name="wait_for_transform" value="0.5"/>
+        <arg name="wait_for_transform" value="5"/>
         <arg name="max_depth" value="$(arg max_depth)"/>
          <arg name="gftt_min_dist" value="$(arg gftt_min_dist)"/>
          <arg name="grid_size" value="$(arg grid_size)"/>

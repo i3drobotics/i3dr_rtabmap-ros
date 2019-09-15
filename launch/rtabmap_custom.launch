@@ -23,6 +23,7 @@
   
   <!-- Localization-only mode -->
   <arg name="localization"            default="false"/>
+  <arg name="use_compressed"          default="false"/>
   
   <!-- sim time for convenience, if playing a rosbag -->
   <arg name="use_sim_time"            default="false"/>
@@ -169,10 +170,10 @@
     <group unless="$(arg rgbd_sync)">
        <group if="$(arg subscribe_rgbd)">
          <node name="republish_rgbd_image"  type="rgbd_relay" pkg="rtabmap_ros">
-           <remap     if="$(arg compressed)" from="rgbd_image" to="$(arg rgbd_topic)/compressed"/>
+           <remap     if="$(arg use_compressed)" from="rgbd_image" to="$(arg rgbd_topic)/compressed"/>
            <remap     if="$(arg compressed)" from="$(arg rgbd_topic)/compressed_relay" to="$(arg rgbd_topic_relay)"/>
-           <remap unless="$(arg compressed)" from="rgbd_image" to="$(arg rgbd_topic)"/>
-           <param if="$(arg compressed)" name="uncompress" value="true"/>
+           <remap unless="$(arg use_compressed)" from="rgbd_image" to="$(arg rgbd_topic)"/>
+           <param if="$(arg use_compressed)" name="uncompress" value="true"/>
          </node>
       </group>
     </group>
