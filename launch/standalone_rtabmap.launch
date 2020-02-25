@@ -1,6 +1,6 @@
 <launch>
 
-  <arg name="camera_namespace" default="phobos_nuclear"/>
+  <arg name="camera_namespace" default="deimos"/>
   <!-- deimos/phobos_nuclear -->
   <arg name="camera_model" default="$(arg camera_namespace)"/>
   <arg name="urdf_namespace" default="$(arg camera_namespace)"/>

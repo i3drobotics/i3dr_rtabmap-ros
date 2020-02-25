@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<!--
+  name:        Mapping Pipeline
+  author:      Marti Morta Garriga
+  date:        8 Aug 2019
+  description: From camera images to octomap map
+  Copyright Wood PLC.
+
+  TODO:  Set Machines
+-->
+
+<launch>
+
+  <arg name="camera_namespace" default="i3dr_stereo"/>
+  <!-- camera model: deimos/phobos -->
+  <arg name="camera_model" default="deimos"/>
+  <!-- urdf namespace: same as camera namespace -->
+  <arg name="urdf_namespace" default="$(arg camera_namespace)"/>
+  <!-- startup camera within this launcher or it is started elsewhere -->
+  <arg name="camera_en" default="true"/>
+  <arg name="scan_frame_id" default="scan" />
+  <arg name="map_frame_id" default="map" />
+  <arg name="rviz" default="false"/>
+  <arg name="rtabmap" default="true"/>
+  <arg name="res" default="0.01"/>
+  <arg name="use_compressed" default="true"/>
+
+  <arg name="map_to_ur10_base" default="false"/>
+  <arg name="map_to_scan" default="false"/>
+
+  <arg name="manual_map_scan" default="true"/>
+
+  <!-- TODO: Calibration routine from scan to map (using aruco) -->
+  <!-- TODO: Fixed tf from scan to map (remove this when calibration routine is ready) -->
+  <node if="$(arg manual_map_scan)" pkg="tf2_ros" type="static_transform_publisher" name="scan_map_tf" args="0 0 0  0 0 0 $(arg map_frame_id) $(arg scan_frame_id)" />
+
+  <!-- camera control-->
+  <include if="$(arg camera_en)" file="$(find i3dr_rtabmap)/launch/ss_stereo.launch">
+    <arg name="camera_namespace" value="$(arg camera_namespace)" />
+    <arg name="camera_model" value="$(arg camera_model)" />
+    <arg name="urdf_namespace" value="$(arg urdf_namespace)"/>
+    <arg name="dropping" value="false" />
+    <arg name="rviz" value="false" />
+    <arg name="sim" value="false" />
+    <arg name="urdf" value="true" />
+  </include>
+
+  <include if="$(arg rtabmap)" file="$(find i3dr_rtabmap)/launch/standalone_rtabmap.launch">
+    <arg name="camera_en" value="false"/>
+    <arg name="camera_namespace" value="$(arg camera_namespace)"/>
+    <arg name="camera_model" value="$(arg camera_model)"/>
+    <arg name="urdf_namespace" value="$(arg urdf_namespace)"/>
+    <arg name="split_laser" value="$(eval arg('camera_model') == 'phobos_nuclear')"/>
+    <arg name="rviz" value="$(arg rviz)" />
+    <arg name="map_frame_id" value="$(arg scan_frame_id)"/>
+    <arg name="grid_size" value="$(arg res)" />
+    <arg if="$(eval arg('camera_model') == 'deimos')" name="gftt_min_dist" value="5"/>
+    <arg if="$(eval arg('camera_model') == 'phobos_nuclear')" name="gftt_min_dist" value="10"/>
+    <arg if="$(eval arg('camera_model') == 'deimos')" name="max_depth" value="3"/>
+    <arg if="$(eval arg('camera_model') == 'phobos_nuclear')" name="max_depth" value="6"/>
+    <arg name="use_compressed" value="$(arg use_compressed)"/>
+  </include>
+
+  <node if="$(arg rtabmap)" name="i3dr_rtabmap_transfer" pkg="i3dr_rtabmap" type="i3dr_rtabmap_transfer.py" output="screen">
+      <param name="rtabmap_namespace" type="string" value="rtabmap"/>
+      <remap from="i3dr_scan_map" to="$(arg camera_namespace)/i3dr_scan_map"/>
+  </node>
+
+</launch>

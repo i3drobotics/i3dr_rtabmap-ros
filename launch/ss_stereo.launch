@@ -1,0 +1,212 @@
+<?xml version="1.0"?>
+<!--
+  name:        Stereo camera subsystem
+  author:      Marti Morta Garriga
+  date:        8 Aug 2019
+  description: Stereo camera subsystem with options for simulation.
+  Copyright Wood PLC.
+
+    TODO:  Set Machines
+-->
+<launch>
+
+  <!-- PARAMETERS -->
+  <arg name="camera_namespace" default="i3dr_stereo" doc="Namespace of the camera" />
+  <arg name="camera_model" default="deimos" doc="[deimos,phobos_nuclear]" />
+  <arg name="urdf_namespace" default="$(arg camera_namespace)" doc="Namespace for urdf frames (prefix e.g. [namespace]_base_link)"/>
+  <arg name="sim" default="false" doc="in simulation, drivers are not run"/>
+  <arg name="urdf" default="true" doc="when part of a higher system urdf should be defined in the other system"/>
+  <arg if="$(eval camera_model == 'deimos')" name="calib_folder" default="6465696d6f7366" doc="name of folder inside i3dr_deimos calibration"/>
+  <!-- p_n uses 2019-09-14-Wood4, phobos_nuclear uses 2019-09-12-Wood -->
+  <arg if="$(eval camera_model == 'phobos_nuclear')" name="calib_folder" default="2019-09-18-Wood" doc="calibration folder inside iind_calibration"/>
+  <arg name="dropping" default="false" doc="If true, it generates topics that publish in a lower frequency"/>
+  <arg name="rviz" default="false" doc="Displays RVIZ for debugging"/>
+  <arg name="depth_max" default="10"/>
+  <arg name="stereo_algorithm" default="0"/>
+  <arg name="stereo_matcher" default="true"/>
+
+  <!-- CAMERA MODEL STANDALONE (URDF=TRUE) -->
+  <group if="$(arg urdf)">
+
+    <arg name="package" value="i3dr_$(arg camera_model)"/>
+    <arg name="camera_urdf_file" value="$(eval find(package) + '/urdf/' + arg('camera_model') + '_scene.urdf.xacro')"/>
+
+    <param name="$(arg urdf_namespace)_description" command="$(find xacro)/xacro --inorder $(arg camera_urdf_file) camera_name:=$(arg urdf_namespace)" />
+
+    <node name="robot_state_publisher_i3dr" pkg="robot_state_publisher" type="state_publisher">
+      <remap from="robot_description" to="$(arg urdf_namespace)_description"/>
+    </node>
+
+  </group>
+
+  <!-- CAMERA DRIVERS -->
+  <group unless="$(arg sim)">
+
+    <!-- PHOBOS DRIVER -->
+    <group if="$(eval arg('camera_model') == 'phobos_nuclear' )">
+      <!-- 0=TIS, 1=Basler -->
+      <arg name="camera_type_index" default="2"/>
+      <!-- Be sure to change this to your cameras ids -->
+      <!-- TIS -->
+      <arg if="$(eval camera_type_index == 0)" name="camera_right_serial" value="31710277"/>
+      <arg if="$(eval camera_type_index == 0)" name="camera_left_serial" value="31710260"/>
+      <!-- Basler -->
+      <arg if="$(eval camera_type_index == 1)" name="camera_right_serial" value="phobos_nuclear_r"/>
+      <arg if="$(eval camera_type_index == 1)" name="camera_left_serial" value="phobos_nuclear_l"/>
+
+      <arg if="$(eval camera_type_index == 2)" name="camera_right_serial" value="p_n_r"/>
+      <arg if="$(eval camera_type_index == 2)" name="camera_left_serial" value="p_n_l"/>
+
+      <arg if="$(eval camera_type_index == 0)" name="camera_type" value="0"/>
+      <arg if="$(eval camera_type_index == 1)" name="camera_type" value="1"/>
+      <arg if="$(eval camera_type_index == 2)" name="camera_type" value="1"/>
+
+      <!-- STEREO CAPTURE: Launches pylon_camera for each side -->
+      <include file="$(find i3dr_stereo_camera)/launch/stereo_capture.launch">
+        <!-- camera startup settings -->
+        <arg name="exposure" value="70000"/>
+        <arg name="gain" value="0"/>
+        <arg name="fps" value="1"/>
+        <arg name="binning" value="1"/>
+        <!-- set camera namespace -->
+        <arg name="camera_namespace" value="$(arg camera_namespace)"/>
+        <!-- camera calibration files-->
+        <arg name="camera_info_right" value="file://$(find iind_calibration)/calibration/phobos_nuclear/$(arg calib_folder)/right.yaml" />
+        <arg name="camera_info_left" value="file://$(find iind_calibration)/calibration/phobos_nuclear/$(arg calib_folder)/left.yaml" />
+        <!-- frame id -->
+        <arg name="frame_id" value="$(arg urdf_namespace)_depth_optical_frame" />
+        <!-- 0=TIS, 1=Basler -->
+        <arg name="camera_type" value="$(arg camera_type)"/>
+        <arg name="camera_right_serial" value="$(arg camera_right_serial)"/>
+        <arg name="camera_left_serial" value="$(arg camera_left_serial)"/>
+        <!-- camera uses split laser interlacing -->
+        <arg name="split_laser" value="true"/>
+      </include>
+
+      <node if="$(arg rviz)" pkg="rviz" type="rviz" name="rivz" args="-d $(find iind_system)/config/test_phobos_nuclear.rviz"/>
+
+    </group>
+
+    <!-- DEIMOS DRIVER -->
+    <group if="$(eval camera_model == 'deimos' )">
+      <include file="$(find i3dr_deimos)/launch/deimos_capture.launch">
+        <arg name="camera_namespace" value="$(arg camera_namespace)"/>
+        <arg name="device" value="/dev/video0"/>
+        <arg name="exposure" value="1" />
+        <arg name="fps" value="1" />
+        <arg name="frame_id" value="$(arg urdf_namespace)_depth_optical_frame" />
+        <arg name="cameraLeft_info_url" value="file://$(find i3dr_deimos)/calibration/$(arg calib_folder)/deimos_left.yaml" />
+        <arg name="cameraRight_info_url" value="file://$(find i3dr_deimos)/calibration/$(arg calib_folder)/deimos_right.yaml" />
+      </include>
+      <node if="$(arg rviz)" pkg="rviz" type="rviz" name="rivz" args="-d $(find i3dr_deimos)/rviz/ss_stereo.rviz"/>
+    </group>
+
+    <!-- STEREO MATCHER -->
+    <group if="$(arg stereo_matcher)">
+      <include if="$(eval arg('camera_model') == 'phobos_nuclear')" file="$(find i3dr_stereo_camera)/launch/stereo_matcher.launch">
+        <arg name="use_i3dr_matcher" value="true"/>
+        <arg name="camera_namespace" value="$(arg camera_namespace)"/>
+        <arg name="frame_id" value="$(arg urdf_namespace)_depth_optical_frame" />
+        <!-- Turn on split laser control for Phobos Nuclear camera (uses images with laser ON for 3D generation) -->
+        <arg name="split_laser" value="$(eval arg('camera_model') == 'phobos_nuclear' )"/>
+        <arg name="gui" value="false"/>
+        <arg name="depth_max" value="$(arg depth_max)"/>
+
+        <!-- algorithm 0: OpenCV Block -->
+        <!-- algorithm 1: OpenCV SGBM -->
+        <!-- algorithm 2: JR SGM -->
+        <arg name="stereo_algorithm" value="$(arg stereo_algorithm)" />
+        <arg if="$(eval stereo_algorithm == 0)" name="min_disparity" value="0" />
+        <arg if="$(eval stereo_algorithm == 0)" name="disparity_range" value="896" />
+        <arg if="$(eval stereo_algorithm == 0)" name="correlation_window_size" value="25" />
+        <arg if="$(eval stereo_algorithm == 0)" name="uniqueness_ratio" value="2" />
+        <arg if="$(eval stereo_algorithm == 0)" name="speckle_range" value="4" />
+        <arg if="$(eval stereo_algorithm == 0)" name="speckle_size" value="1000" />
+        <arg if="$(eval stereo_algorithm == 0)" name="prefilter_size" value="147" />
+        <arg if="$(eval stereo_algorithm == 0)" name="prefilter_cap" value="7" />
+        <arg if="$(eval stereo_algorithm == 0)" name="p1" value="200"/>
+        <arg if="$(eval stereo_algorithm == 0)" name="p2" value="400"/>
+        <arg if="$(eval stereo_algorithm == 0)" name="interp" value="false"/>
+
+        <arg if="$(eval stereo_algorithm == 1)" name="min_disparity" value="0" />
+        <arg if="$(eval stereo_algorithm == 1)" name="disparity_range" value="896" />
+        <arg if="$(eval stereo_algorithm == 1)" name="correlation_window_size" value="9" />
+        <arg if="$(eval stereo_algorithm == 1)" name="uniqueness_ratio" value="2" />
+        <arg if="$(eval stereo_algorithm == 1)" name="texture_threshold" value="10" />
+        <arg if="$(eval stereo_algorithm == 1)" name="speckle_range" value="4" />
+        <arg if="$(eval stereo_algorithm == 1)" name="speckle_size" value="1000" />
+        <arg if="$(eval stereo_algorithm == 1)" name="prefilter_size" value="147" />
+        <arg if="$(eval stereo_algorithm == 1)" name="prefilter_cap" value="7" />
+        <arg if="$(eval stereo_algorithm == 1)" name="p1" value="200"/>
+        <arg if="$(eval stereo_algorithm == 1)" name="p2" value="400"/>
+        <arg if="$(eval stereo_algorithm == 1)" name="interp" value="false"/>
+
+        <arg if="$(eval stereo_algorithm == 2)" name="min_disparity" value="0" />
+        <arg if="$(eval stereo_algorithm == 2)" name="disparity_range" value="21" />
+        <arg if="$(eval stereo_algorithm == 2)" name="correlation_window_size" value="9" />
+        <arg if="$(eval stereo_algorithm == 2)" name="p1" value="10"/>
+        <arg if="$(eval stereo_algorithm == 2)" name="p2" value="80"/>
+        <arg if="$(eval stereo_algorithm == 2)" name="interp" value="false"/>
+
+      </include>
+
+      <include if="$(eval arg('camera_model') == 'deimos')" file="$(find i3dr_stereo_camera)/launch/stereo_matcher.launch">
+        <arg name="use_i3dr_matcher" value="true"/>
+        <arg name="camera_namespace" value="$(arg camera_namespace)"/>
+        <arg name="frame_id" value="$(arg urdf_namespace)_depth_optical_frame" />
+        <!-- Turn on split laser control for Phobos Nuclear camera (uses images with laser ON for 3D generation) -->
+        <arg name="split_laser" value="$(eval camera_model == 'phobos_nuclear' )"/>
+        <arg name="gui" value="false"/>
+        <arg name="depth_max" value="10"/>
+
+        <!-- algorithm 0: OpenCV Block -->
+        <!-- algorithm 1: OpenCV SGBM -->
+        <!-- algorithm 2: JR SGM -->
+        <arg name="stereo_algorithm" value="$(arg stereo_algorithm)" />
+        <arg if="$(eval stereo_algorithm == 0)" name="min_disparity" value="-71" />
+        <arg if="$(eval stereo_algorithm == 0)" name="disparity_range" value="160" />
+        <arg if="$(eval stereo_algorithm == 0)" name="correlation_window_size" value="21" />
+        <arg if="$(eval stereo_algorithm == 0)" name="uniqueness_ratio" value="2" />
+        <arg if="$(eval stereo_algorithm == 0)" name="speckle_range" value="4" />
+        <arg if="$(eval stereo_algorithm == 0)" name="speckle_size" value="1000" />
+        <arg if="$(eval stereo_algorithm == 0)" name="prefilter_size" value="147" />
+        <arg if="$(eval stereo_algorithm == 0)" name="prefilter_cap" value="7" />
+        <arg if="$(eval stereo_algorithm == 0)" name="p1" value="200"/>
+        <arg if="$(eval stereo_algorithm == 0)" name="p2" value="400"/>
+        <arg if="$(eval stereo_algorithm == 0)" name="interp" value="false"/>
+
+        <arg if="$(eval stereo_algorithm == 1)" name="min_disparity" value="-71" />
+        <arg if="$(eval stereo_algorithm == 1)" name="disparity_range" value="160" />
+        <arg if="$(eval stereo_algorithm == 1)" name="correlation_window_size" value="21" />
+        <arg if="$(eval stereo_algorithm == 1)" name="uniqueness_ratio" value="2" />
+        <arg if="$(eval stereo_algorithm == 1)" name="texture_threshold" value="10" />
+        <arg if="$(eval stereo_algorithm == 1)" name="speckle_range" value="4" />
+        <arg if="$(eval stereo_algorithm == 1)" name="speckle_size" value="1000" />
+        <arg if="$(eval stereo_algorithm == 1)" name="prefilter_size" value="147" />
+        <arg if="$(eval stereo_algorithm == 1)" name="prefilter_cap" value="7" />
+        <arg if="$(eval stereo_algorithm == 1)" name="p1" value="200"/>
+        <arg if="$(eval stereo_algorithm == 1)" name="p2" value="400"/>
+        <arg if="$(eval stereo_algorithm == 1)" name="interp" value="false"/>
+
+        <arg if="$(eval stereo_algorithm == 2)" name="min_disparity" value="0" />
+        <arg if="$(eval stereo_algorithm == 2)" name="disparity_range" value="21" />
+        <arg if="$(eval stereo_algorithm == 2)" name="correlation_window_size" value="9" />
+        <arg if="$(eval stereo_algorithm == 2)" name="p1" value="10"/>
+        <arg if="$(eval stereo_algorithm == 2)" name="p2" value="80"/>
+        <arg if="$(eval stereo_algorithm == 2)" name="interp" value="false"/>
+
+      </include>
+    </group>
+
+    <!-- Frequency reduction for high frequency topics  -->
+    <group if="$(arg dropping)">
+      <node pkg="topic_tools" type="drop" args="/$(arg camera_namespace)/left/image_raw 25 30    /drop/$(arg camera_namespace)/left/image_raw" name="drop_left_ir"></node>
+      <node pkg="topic_tools" type="drop" args="/$(arg camera_namespace)/left/camera_info 25 30  /drop/$(arg camera_namespace)/left/camera_info" name="drop_left_ci"></node>
+      <node pkg="topic_tools" type="drop" args="/$(arg camera_namespace)/right/image_raw 25 30   /drop/$(arg camera_namespace)/right/image_raw" name="drop_right_ir"></node>
+      <node pkg="topic_tools" type="drop" args="/$(arg camera_namespace)/right/camera_info 25 30 /drop/$(arg camera_namespace)/right/camera_info" name="drop_right_ci"></node>
+    </group>
+
+  </group>
+
+
+</launch>

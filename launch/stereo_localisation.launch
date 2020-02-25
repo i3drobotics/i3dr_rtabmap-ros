@@ -47,8 +47,8 @@
         <arg name="approx_sync" value="true"/>
         <arg name="wait_for_transform" value="5"/>
         <arg name="max_depth" value="$(arg max_depth)"/>
-         <arg name="gftt_min_dist" value="$(arg gftt_min_dist)"/>
-         <arg name="grid_size" value="$(arg grid_size)"/>
+        <arg name="gftt_min_dist" value="$(arg gftt_min_dist)"/>
+        <arg name="grid_size" value="$(arg grid_size)"/>
         <arg name="output" value="$(arg node_output)"/>
     </include>
 
