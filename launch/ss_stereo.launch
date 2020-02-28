@@ -18,11 +18,12 @@
   <arg name="urdf" default="true" doc="when part of a higher system urdf should be defined in the other system"/>
   <arg if="$(eval camera_model == 'deimos')" name="calib_folder" default="6465696d6f7366" doc="name of folder inside i3dr_deimos calibration"/>
   <!-- p_n uses 2019-09-14-Wood4, phobos_nuclear uses 2019-09-12-Wood -->
-  <arg if="$(eval camera_model == 'phobos_nuclear')" name="calib_folder" default="2019-09-18-Wood" doc="calibration folder inside iind_calibration"/>
+  <arg if="$(eval camera_model == 'phobos_nuclear')" name="calib_folder" default="25-02-2020" doc="calibration folder inside iind_calibration"/>
   <arg name="dropping" default="false" doc="If true, it generates topics that publish in a lower frequency"/>
   <arg name="rviz" default="false" doc="Displays RVIZ for debugging"/>
-  <arg name="depth_max" default="10"/>
-  <arg name="stereo_algorithm" default="0"/>
+  <arg name="depth_max" default="3"/>
+  <arg name="depth_min" default="0"/>
+  <arg name="stereo_algorithm" default="2"/>
   <arg name="stereo_matcher" default="true"/>
 
   <!-- CAMERA MODEL STANDALONE (URDF=TRUE) -->
@@ -45,34 +46,27 @@
     <!-- PHOBOS DRIVER -->
     <group if="$(eval arg('camera_model') == 'phobos_nuclear' )">
       <!-- 0=TIS, 1=Basler -->
-      <arg name="camera_type_index" default="2"/>
+      <arg name="camera_type" default="1"/>
       <!-- Be sure to change this to your cameras ids -->
       <!-- TIS -->
-      <arg if="$(eval camera_type_index == 0)" name="camera_right_serial" value="31710277"/>
-      <arg if="$(eval camera_type_index == 0)" name="camera_left_serial" value="31710260"/>
+      <arg if="$(eval camera_type == 0)" name="camera_right_serial" value="31710277"/>
+      <arg if="$(eval camera_type == 0)" name="camera_left_serial" value="31710260"/>
       <!-- Basler -->
-      <arg if="$(eval camera_type_index == 1)" name="camera_right_serial" value="phobos_nuclear_r"/>
-      <arg if="$(eval camera_type_index == 1)" name="camera_left_serial" value="phobos_nuclear_l"/>
-
-      <arg if="$(eval camera_type_index == 2)" name="camera_right_serial" value="p_n_r"/>
-      <arg if="$(eval camera_type_index == 2)" name="camera_left_serial" value="p_n_l"/>
-
-      <arg if="$(eval camera_type_index == 0)" name="camera_type" value="0"/>
-      <arg if="$(eval camera_type_index == 1)" name="camera_type" value="1"/>
-      <arg if="$(eval camera_type_index == 2)" name="camera_type" value="1"/>
+      <arg if="$(eval camera_type == 1)" name="camera_right_serial" value="phobos_nuclear_r"/>
+      <arg if="$(eval camera_type == 1)" name="camera_left_serial" value="phobos_nuclear_l"/>
 
       <!-- STEREO CAPTURE: Launches pylon_camera for each side -->
       <include file="$(find i3dr_stereo_camera)/launch/stereo_capture.launch">
         <!-- camera startup settings -->
-        <arg name="exposure" value="70000"/>
+        <arg name="exposure" value="40000"/>
         <arg name="gain" value="0"/>
         <arg name="fps" value="1"/>
         <arg name="binning" value="1"/>
         <!-- set camera namespace -->
         <arg name="camera_namespace" value="$(arg camera_namespace)"/>
         <!-- camera calibration files-->
-        <arg name="camera_info_right" value="file://$(find iind_calibration)/calibration/phobos_nuclear/$(arg calib_folder)/right.yaml" />
-        <arg name="camera_info_left" value="file://$(find iind_calibration)/calibration/phobos_nuclear/$(arg calib_folder)/left.yaml" />
+        <arg name="camera_info_right" value="file://$(find i3dr_phobos_nuclear)/calibration/$(arg calib_folder)/phobos_nuclear_left.yaml" />
+        <arg name="camera_info_left" value="file://$(find i3dr_phobos_nuclear)/calibration/$(arg calib_folder)/phobos_nuclear_right.yaml" />
         <!-- frame id -->
         <arg name="frame_id" value="$(arg urdf_namespace)_depth_optical_frame" />
         <!-- 0=TIS, 1=Basler -->
@@ -80,7 +74,9 @@
         <arg name="camera_right_serial" value="$(arg camera_right_serial)"/>
         <arg name="camera_left_serial" value="$(arg camera_left_serial)"/>
         <!-- camera uses split laser interlacing -->
-        <arg name="split_laser" value="true"/>
+        <arg name="split_laser" value="false"/>
+        <arg name="reverse_x" value="false"/>
+        <arg name="reverse_y" value="true"/>
       </include>
 
       <node if="$(arg rviz)" pkg="rviz" type="rviz" name="rivz" args="-d $(find iind_system)/config/test_phobos_nuclear.rviz"/>
@@ -108,9 +104,11 @@
         <arg name="camera_namespace" value="$(arg camera_namespace)"/>
         <arg name="frame_id" value="$(arg urdf_namespace)_depth_optical_frame" />
         <!-- Turn on split laser control for Phobos Nuclear camera (uses images with laser ON for 3D generation) -->
-        <arg name="split_laser" value="$(eval arg('camera_model') == 'phobos_nuclear' )"/>
+        <!--<arg name="split_laser" value="$(eval arg('camera_model') == 'phobos_nuclear' )"/>-->
+        <arg name="split_laser" value="false"/>
         <arg name="gui" value="false"/>
         <arg name="depth_max" value="$(arg depth_max)"/>
+        <arg name="depth_min" value="$(arg depth_min)"/>
 
         <!-- algorithm 0: OpenCV Block -->
         <!-- algorithm 1: OpenCV SGBM -->
@@ -157,7 +155,8 @@
         <!-- Turn on split laser control for Phobos Nuclear camera (uses images with laser ON for 3D generation) -->
         <arg name="split_laser" value="$(eval camera_model == 'phobos_nuclear' )"/>
         <arg name="gui" value="false"/>
-        <arg name="depth_max" value="10"/>
+        <arg name="depth_max" value="$(arg depth_max)"/>
+        <arg name="depth_min" value="$(arg depth_min)"/>
 
         <!-- algorithm 0: OpenCV Block -->
         <!-- algorithm 1: OpenCV SGBM -->

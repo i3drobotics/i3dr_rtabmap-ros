@@ -330,7 +330,7 @@
       <param name="Rtabmap/LoopThr" value="0.11"/> <!-- default: 0.11 -->
       <param name="Vis/MaxDepth" value="$(arg max_depth)"/>
 
-      <param name="Rtabmap/StartNewMapOnLoopClosure" value="true"/>
+      <!--<param name="Rtabmap/StartNewMapOnLoopClosure" value="true"/>-->
 
     </node>
   
