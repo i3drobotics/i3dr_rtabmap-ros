@@ -23,7 +23,7 @@
   <arg name="rviz" default="false" doc="Displays RVIZ for debugging"/>
   <arg name="depth_max" default="3"/>
   <arg name="depth_min" default="0"/>
-  <arg name="stereo_algorithm" default="2"/>
+  <arg name="stereo_algorithm" default="0"/>
   <arg name="stereo_matcher" default="true"/>
 
   <!-- CAMERA MODEL STANDALONE (URDF=TRUE) -->

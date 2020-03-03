@@ -13,6 +13,7 @@
   <!-- true/false -->
   <arg name="localization" default="false"/>
   <arg name="camera_en" default="false"/>
+  <arg name="imu" default="false" />
   <!-- true/false -->
   <arg name="rviz" default="false"/>
 
@@ -35,7 +36,7 @@
   </group>
 
   <!-- rviz for debugging -->
-  <node if="$(arg rviz)" pkg="rviz" type="rviz" name="rivz" args="-d $(find i3dr_rtabmap)/config/test_mapping_$(arg camera_model).rviz"/>
+  <node if="$(arg rviz)" pkg="rviz" type="rviz" name="standalone_rtabmap_rivz" args="-d $(find i3dr_rtabmap)/config/test_mapping_$(arg camera_model).rviz"/>
 
   <!-- STEREO REGISTRATOIN -->
   <include file="$(find i3dr_rtabmap)/launch/stereo_localisation.launch">
@@ -53,6 +54,7 @@
     <!-- should be set to true if using SGBM or Phobos/Phobos_nuclear as these takes longer to process -->
     <arg name="split_laser" value="$(arg split_laser)"/>
     <arg name="localization" value="false"/>
+    <arg name="imu" value="$(arg imu)" />
     <!-- TODO allow switch to localisation -->
     <arg name="rviz" value="false"/>
     <arg name="rtabmapviz" value="true"/>

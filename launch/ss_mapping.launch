@@ -13,7 +13,7 @@
 
   <arg name="camera_namespace" default="i3dr_stereo"/>
   <!-- camera model: deimos/phobos_nuclear -->
-  <arg name="camera_model" default="phobos_nuclear"/>
+  <arg name="camera_model" default="deimos"/>
   <!-- urdf namespace: same as camera namespace -->
   <arg name="urdf_namespace" default="$(arg camera_namespace)"/>
   <!-- startup camera within this launcher or it is started elsewhere -->
@@ -24,6 +24,7 @@
   <arg name="rtabmap" default="true"/>
   <arg name="res" default="0.01"/>
   <arg name="use_compressed" default="true"/>
+  <arg name="imu" default="true" />
 
   <arg name="map_to_ur10_base" default="false"/>
   <arg name="map_to_scan" default="false"/>
@@ -57,6 +58,7 @@
     <arg name="rviz" value="$(arg rviz)" />
     <arg name="map_frame_id" value="$(arg scan_frame_id)"/>
     <arg name="grid_size" value="$(arg res)" />
+    <arg name="imu" value="$(arg imu)" />
     <arg if="$(eval arg('camera_model') == 'deimos')" name="gftt_min_dist" value="5"/>
     <arg if="$(eval arg('camera_model') == 'phobos_nuclear')" name="gftt_min_dist" value="10"/>
     <arg if="$(eval arg('camera_model') == 'deimos')" name="max_depth" value="3"/>
