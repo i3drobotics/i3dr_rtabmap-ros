@@ -6,7 +6,6 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /TF1/Frames1
       Splitter Ratio: 0.496913582
     Tree Height: 600
   - Class: rviz/Selection
@@ -27,7 +26,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: Depth
+    SyncSource: Left
 Toolbars:
   toolButtonStyle: 2
 Visualization Manager:
@@ -90,6 +89,10 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+        i3dr_phobos_imu_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         i3dr_phobos_mount_base_link:
           Alpha: 1
           Show Axes: false
@@ -135,6 +138,8 @@ Visualization Manager:
           Value: true
         i3dr_phobos_depth_optical_frame:
           Value: true
+        i3dr_phobos_imu_link:
+          Value: true
         i3dr_phobos_mount_base_link:
           Value: true
         i3dr_phobos_mount_point_1:
@@ -147,35 +152,34 @@ Visualization Manager:
           Value: true
         odom:
           Value: false
-        scan:
-          Value: false
-      Marker Scale: 1
+      Marker Scale: 0.300000012
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: true
       Tree:
-        scan:
-          odom:
-            i3dr_phobos_base_link:
-              i3dr_phobos_mount_base_link:
-                i3dr_phobos_center:
-                  i3dr_phobos_cameraLeft:
-                    i3dr_phobos_cameraLeft_optical:
-                      {}
-                    i3dr_phobos_depth_optical_frame:
-                      {}
-                  i3dr_phobos_cameraRight:
-                    i3dr_phobos_cameraRight_optical:
-                      {}
-                i3dr_phobos_mount_point_1:
-                  {}
-                i3dr_phobos_mount_point_2:
-                  {}
-                i3dr_phobos_mount_point_3:
-                  {}
-                i3dr_phobos_mount_point_4:
-                  {}
+        odom:
+          i3dr_phobos_base_link:
+            i3dr_phobos_imu_link:
+              {}
+            i3dr_phobos_mount_base_link:
+              i3dr_phobos_center:
+                i3dr_phobos_cameraLeft:
+                  i3dr_phobos_cameraLeft_optical:
+                    {}
+                  i3dr_phobos_depth_optical_frame:
+                    {}
+                i3dr_phobos_cameraRight:
+                  i3dr_phobos_cameraRight_optical:
+                    {}
+              i3dr_phobos_mount_point_1:
+                {}
+              i3dr_phobos_mount_point_2:
+                {}
+              i3dr_phobos_mount_point_3:
+                {}
+              i3dr_phobos_mount_point_4:
+                {}
       Update Interval: 0
       Value: true
     - Class: rtabmap_ros/Info
@@ -318,11 +322,20 @@ Visualization Manager:
       Transport Hint: raw
       Unreliable: false
       Value: true
+    - Alpha: 1
+      Class: rviz_plugin_tutorials/Imu
+      Color: 204; 51; 204
+      Enabled: true
+      History Length: 1
+      Name: Imu
+      Topic: /imu/data
+      Unreliable: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: scan
+    Fixed Frame: odom
     Frame Rate: 30
   Name: root
   Tools:
@@ -343,25 +356,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.42437267
+      Distance: 1.26488996
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.072812885
-        Y: -0.0465604439
-        Z: 0.319351017
+        X: -0.0674075484
+        Y: -0.0330328643
+        Z: 0.230423823
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.290399194
+      Pitch: 0.230399147
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.44537735
+      Yaw: 4.47856617
     Saved: ~
 Window Geometry:
   Depth:

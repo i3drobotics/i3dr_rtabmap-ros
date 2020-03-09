@@ -15,7 +15,7 @@
     <arg name="grid_size" default="0.05"/>
     <arg name="use_compressed" default="false"/>
 
-    <arg name="custom_rtabmap" default="false"/>
+    <arg name="custom_rtabmap" default="true"/>
 
     <arg if="$(arg use_compressed)" name="no_use_compressed" value="false" />
     <arg unless="$(arg use_compressed)" name="no_use_compressed" value="true" />

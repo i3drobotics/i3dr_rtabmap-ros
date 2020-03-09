@@ -205,7 +205,8 @@
           <param name="guess_min_translation"       type="double" value="$(arg odom_guess_min_translation)"/>
           <param name="guess_min_rotation"          type="double" value="$(arg odom_guess_min_rotation)"/>
 
-          <param name="Vis/FeatureType" type="int" value="8"/>
+          <param name="Vis/FeatureType" type="int" value="10"/>
+          <param name="Kp/DetectorStrategy=10" type="int" value="10"/>
           <param name="GFTT/MinDistance" type="string" value="$(arg gftt_min_dist)"/> <!-- default 5 pixels, High res should use 10 -->
           <param name="Vis/MaxDepth" type="string" value="$(arg max_depth)"/>
           <param name="OdomF2M/MaxSize" type="string" value="2000"/> <!-- default 2000 -->
@@ -214,10 +215,10 @@
           <!--<param name="Odom/ResetCountdown" value="1" />-->
 
           <param name="RGBD/LoopClosureReextractFeatures" value="true"/>
-          <param name="Vis/MinInliers" value="20"/> <!-- default 20 -->
+          <param name="Vis/MinInliers" value="10"/> <!-- default 20 -->
 
           <!-- reset odom when lost -->
-          <param name="Odom/ResetCountdown" value="3"/>
+          <param name="Odom/ResetCountdown" value="0"/>
         
         </node>
 
