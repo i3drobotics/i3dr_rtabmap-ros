@@ -206,19 +206,24 @@
           <param name="guess_min_rotation"          type="double" value="$(arg odom_guess_min_rotation)"/>
 
           <param name="Vis/FeatureType" type="int" value="10"/>
-          <param name="Kp/DetectorStrategy=10" type="int" value="10"/>
+          <param name="Kp/DetectorStrategy" type="int" value="10"/>
+          <param name="Kp/MaxDepth"  type="string" value="0"/> <!-- unlimited distance for the vocabulary  -->
+          <param name="Optimizer/Strategy"  type="string" value="2"/> <!-- GTSAM global optimization -->
+          <param name="Kp/NNStrategy"       type="string" value="1"/> <!-- KdTree -->
+          <param name="Vis/CorNNType"       type="string" value="1"/> <!-- KdTree -->
+          <param name="Vis/EstimationType" type="string" value="1"/> <!-- use 2D to 3D estimation -->
+
           <param name="GFTT/MinDistance" type="string" value="$(arg gftt_min_dist)"/> <!-- default 5 pixels, High res should use 10 -->
           <param name="Vis/MaxDepth" type="string" value="$(arg max_depth)"/>
           <param name="OdomF2M/MaxSize" type="string" value="2000"/> <!-- default 2000 -->
           <param name="Vis/MaxFeatures" type="string" value="1000"/> <!-- default 1000 -->
           <!--<param name="Vis/CorType" value="1"/>-->
-          <!--<param name="Odom/ResetCountdown" value="1" />-->
 
           <param name="RGBD/LoopClosureReextractFeatures" value="true"/>
-          <param name="Vis/MinInliers" value="10"/> <!-- default 20 -->
+          <param name="Vis/MinInliers" value="20"/> <!-- default 20 -->
 
           <!-- reset odom when lost -->
-          <param name="Odom/ResetCountdown" value="0"/>
+          <param name="Odom/ResetCountdown" value="5"/>
         
         </node>
 
@@ -331,7 +336,7 @@
       <param name="Rtabmap/LoopThr" value="0.11"/> <!-- default: 0.11 -->
       <param name="Vis/MaxDepth" value="$(arg max_depth)"/>
 
-      <!--<param name="Rtabmap/StartNewMapOnLoopClosure" value="true"/>-->
+      <param name="Rtabmap/StartNewMapOnLoopClosure" value="false"/>
 
     </node>
   
