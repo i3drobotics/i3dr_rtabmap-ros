@@ -3,7 +3,6 @@
     <arg name="camera_model" default="$(arg camera_namespace)"/>
     <arg name="urdf_namespace" default="$(arg camera_namespace)"/>
     <arg name="slow_processing" default="false"/>
-    <arg name="split_laser" default="false"/>
     <arg name="localization" default="false"/> <!-- TODO allow switch to localisation -->
     <arg name="imu" default="false"/>
     <arg name="rviz" default="false"/>
@@ -17,10 +16,7 @@
 
     <arg name="custom_rtabmap" default="true"/>
 
-    <arg if="$(arg use_compressed)" name="no_use_compressed" value="false" />
-    <arg unless="$(arg use_compressed)" name="no_use_compressed" value="true" />
-    <arg if="$(arg split_laser)" name="no_split_laser" value="false" />
-    <arg unless="$(arg split_laser)" name="no_split_laser" value="true" />
+    <arg name="rgb_topic" default="/$(arg camera_namespace)/left/image_rect" />
 
     <!-- DISPLAY -->
     <!-- run rviz with config file -->
@@ -31,8 +27,7 @@
         <arg name="args" value="--delete_db_on_start"/>
         <arg name="frame_id" value="$(arg urdf_namespace)_base_link"/>
         <arg name="map_frame_id" value="$(arg map_frame_id)"/>
-        <arg if="$(eval arg('no_split_laser'))" name="rgb_topic" value="/$(arg camera_namespace)/left/image_rect"/>
-        <arg if="$(eval arg('split_laser'))" name="rgb_topic" value="/$(arg camera_namespace)/left/image_rect_no_laser"/>
+        <arg name="rgb_topic" value="$(arg rgb_topic)"/>
         <arg name="depth_topic" value="/$(arg camera_namespace)/depth"/>
         <arg name="camera_info_topic" value="/$(arg camera_namespace)/left/camera_info"/>
         <arg name="use_compressed" value="$(arg use_compressed)"/>
@@ -52,8 +47,7 @@
     <include unless="$(arg custom_rtabmap)" file="$(find rtabmap_ros)/launch/rtabmap.launch">
         <arg name="args" value="--delete_db_on_start"/>
         <arg name="frame_id" value="$(arg urdf_namespace)_base_link"/>
-        <arg unless="$(arg split_laser)" name="rgb_topic" value="/$(arg camera_namespace)/left/image_rect"/>
-        <arg if="$(arg split_laser)" name="rgb_topic" value="/$(arg camera_namespace)/left/image_rect_no_laser"/>
+        <arg name="rgb_topic" value="$(arg rgb_topic)"/>
         <arg name="depth_topic" value="/$(arg camera_namespace)/depth"/>
         <arg name="camera_info_topic" value="/$(arg camera_namespace)/left/camera_info"/>
         <arg name="depth_camera_info_topic" value="/$(arg camera_namespace)/left/camera_info"/>

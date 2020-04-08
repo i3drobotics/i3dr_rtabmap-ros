@@ -7,6 +7,7 @@ Panels:
         - /Global Options1
         - /Status1
         - /TF1/Frames1
+        - /PointCloud2Live1
       Splitter Ratio: 0.496913582
     Tree Height: 600
   - Class: rviz/Selection
@@ -61,72 +62,6 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        phobos_nuclear_base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        phobos_nuclear_cameraLeft:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        phobos_nuclear_cameraLeft_optical:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        phobos_nuclear_cameraLeft_sim:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        phobos_nuclear_cameraRight:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        phobos_nuclear_cameraRight_optical:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        phobos_nuclear_camerabar_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        phobos_nuclear_center:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        phobos_nuclear_depth_optical_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        phobos_nuclear_imu_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        phobos_nuclear_interface_plate_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        phobos_nuclear_mount_base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        phobos_nuclear_mount_point_1:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        phobos_nuclear_mount_point_2:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        phobos_nuclear_mount_point_3:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        phobos_nuclear_mount_point_4:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
       Name: RobotModel
       Robot Description: phobos_nuclear_robot_description
       TF Prefix: ""
@@ -138,6 +73,14 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
+        base:
+          Value: true
+        base_link:
+          Value: true
+        ee_link:
+          Value: true
+        forearm_link:
+          Value: true
         odom:
           Value: false
         phobos_nuclear_base_link:
@@ -146,23 +89,13 @@ Visualization Manager:
           Value: false
         phobos_nuclear_cameraLeft_optical:
           Value: false
-        phobos_nuclear_cameraLeft_sim:
-          Value: false
         phobos_nuclear_cameraRight:
           Value: false
         phobos_nuclear_cameraRight_optical:
           Value: false
-        phobos_nuclear_camerabar_link:
-          Value: false
         phobos_nuclear_center:
           Value: false
         phobos_nuclear_depth_optical_frame:
-          Value: false
-        phobos_nuclear_imu_link:
-          Value: false
-        phobos_nuclear_interface_plate_link:
-          Value: false
-        phobos_nuclear_mount_base_link:
           Value: false
         phobos_nuclear_mount_point_1:
           Value: false
@@ -174,6 +107,22 @@ Visualization Manager:
           Value: false
         scan:
           Value: false
+        shoulder_link:
+          Value: true
+        tool0:
+          Value: true
+        tool0_controller:
+          Value: true
+        upper_arm_link:
+          Value: true
+        world:
+          Value: true
+        wrist_1_link:
+          Value: true
+        wrist_2_link:
+          Value: true
+        wrist_3_link:
+          Value: true
       Marker Scale: 1
       Name: TF
       Show Arrows: true
@@ -182,31 +131,7 @@ Visualization Manager:
       Tree:
         scan:
           odom:
-            phobos_nuclear_base_link:
-              phobos_nuclear_imu_link:
-                {}
-              phobos_nuclear_mount_base_link:
-                phobos_nuclear_center:
-                  phobos_nuclear_cameraLeft:
-                    phobos_nuclear_cameraLeft_optical:
-                      phobos_nuclear_depth_optical_frame:
-                        {}
-                    phobos_nuclear_cameraLeft_sim:
-                      {}
-                  phobos_nuclear_cameraRight:
-                    phobos_nuclear_cameraRight_optical:
-                      {}
-                phobos_nuclear_interface_plate_link:
-                  phobos_nuclear_camerabar_link:
-                    {}
-                phobos_nuclear_mount_point_1:
-                  {}
-                phobos_nuclear_mount_point_2:
-                  {}
-                phobos_nuclear_mount_point_3:
-                  {}
-                phobos_nuclear_mount_point_4:
-                  {}
+            {}
       Update Interval: 0
       Value: true
     - Class: rtabmap_ros/Info
@@ -320,7 +245,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.00999999978
       Style: Points
-      Topic: /phobos_nuclear/points2
+      Topic: /phobos_nuclear/points2_b
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
@@ -374,25 +299,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.74035335
+      Distance: 1.34772968
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.0475504398
-        Y: 0.00165308185
-        Z: 0.445604086
+        X: -0.0278059449
+        Y: 0.154606685
+        Z: 0.447920024
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.43039903
+      Pitch: 0.115399487
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.95856237
+      Yaw: 0.920369267
     Saved: ~
 Window Geometry:
   Depth:
@@ -416,5 +341,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1855
-  X: 1985
+  X: 65
   Y: 24

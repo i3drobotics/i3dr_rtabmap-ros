@@ -4,7 +4,6 @@
   <!-- deimos/phobos_nuclear -->
   <arg name="camera_model" default="$(arg camera_namespace)"/>
   <arg name="urdf_namespace" default="$(arg camera_namespace)"/>
-  <arg name="split_laser" default="true"/>
   <arg name="map_frame_id" default="map"/>
   <arg name="grid_size" default="0.05"/>
 
@@ -18,6 +17,8 @@
   <arg name="rviz" default="false"/>
 
   <arg name="use_compressed" default="false"/>
+
+  <arg name="rgb_topic" default="/$(arg camera_namespace)/left/image_rect" />
 
   <arg if="$(arg camera_en)" name="package" value="i3dr_$(arg camera_model)"/>
   <arg if="$(arg camera_en)" name="cameraLeft_info_url" default="$(eval 'file://' + find(arg('package')) + '/calibration/' + arg('camera_model') + '_left.yaml')" doc="Calibration file for left camera (Only used in offline mode)"/>
@@ -40,6 +41,7 @@
 
   <!-- STEREO REGISTRATOIN -->
   <include file="$(find i3dr_rtabmap)/launch/stereo_localisation.launch">
+    <arg name="rgb_topic" value="$(arg rgb_topic)" />
     <arg name="camera_namespace" value="$(arg camera_namespace)" />
     <arg name="camera_model" value="$(arg camera_model)"/>
     <arg name="urdf_namespace" value="$(arg urdf_namespace)"/>
@@ -52,7 +54,6 @@
     <arg name="node_output" value="screen"/>
     <arg name="use_compressed" value="$(arg use_compressed)"/>
     <!-- should be set to true if using SGBM or Phobos/Phobos_nuclear as these takes longer to process -->
-    <arg name="split_laser" value="$(arg split_laser)"/>
     <arg name="localization" value="false"/>
     <arg name="imu" value="$(arg imu)" />
     <!-- TODO allow switch to localisation -->
