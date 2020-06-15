@@ -30,5 +30,7 @@
   <exec_depend>imu_filter_madgwick</exec_depend>
   <exec_depend>rtabmap</exec_depend>
   <exec_depend>tf</exec_depend>
+  <exec_depend>octomap_rviz_plugins</exec_depend>
+  <exec_depend>robot_localization</exec_depend>
 
 </package>

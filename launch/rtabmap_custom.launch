@@ -213,6 +213,7 @@
           <param name="Vis/CorNNType"       type="string" value="1"/> <!-- KdTree -->
           <param name="Vis/EstimationType" type="string" value="1"/> <!-- use 2D to 3D estimation -->
 
+          <param name="Grid/CellSize" value="$(arg grid_size)"/> <!-- default: 0.05 -->
           <param name="GFTT/MinDistance" type="string" value="$(arg gftt_min_dist)"/> <!-- default 5 pixels, High res should use 10 -->
           <param name="Vis/MaxDepth" type="string" value="$(arg max_depth)"/>
           <param name="OdomF2M/MaxSize" type="string" value="2000"/> <!-- default 2000 -->
@@ -330,9 +331,10 @@
       <param unless="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="true"/>
       <param name="Mem/InitWMWithAllNodes" type="string" value="$(arg localization)"/>
 
+      <param name="Grid/DepthDecimation"              type="string" value="4"/>
       <param name="Grid/CellSize" value="$(arg grid_size)"/> <!-- default: 0.05 -->
-      <param name="Rtabmap/DetectionRate" value="0"/> <!-- default: 1.00 -->
-      <param name="Rtabmap/ImageBufferSize" value="0"/> <!-- default: 1 -->
+      <param name="Rtabmap/DetectionRate" value="1"/> <!-- default: 1.00 -->
+      <param name="Rtabmap/ImageBufferSize" value="1"/> <!-- default: 1 -->
       <param name="Rtabmap/LoopThr" value="0.11"/> <!-- default: 0.11 -->
       <param name="Vis/MaxDepth" value="$(arg max_depth)"/>
 

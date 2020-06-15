@@ -11,6 +11,8 @@
   <arg name="max_depth" default="3"/>
   <!-- true/false -->
   <arg name="localization" default="false"/>
+  <arg name="database_path" default="~/.ros/rtabmap.db"/>
+  <arg name="clearMapOnStart" default="true" />
   <arg name="camera_en" default="false"/>
   <arg name="imu" default="false" />
   <!-- true/false -->
@@ -54,11 +56,28 @@
     <arg name="node_output" value="screen"/>
     <arg name="use_compressed" value="$(arg use_compressed)"/>
     <!-- should be set to true if using SGBM or Phobos/Phobos_nuclear as these takes longer to process -->
-    <arg name="localization" value="false"/>
+    <arg name="localization" value="$(arg localization)"/>
+    <arg name="database_path" value="$(arg database_path)"/>
+    <arg name="clearMapOnStart" value="$(arg clearMapOnStart)"/>
     <arg name="imu" value="$(arg imu)" />
     <!-- TODO allow switch to localisation -->
     <arg name="rviz" value="false"/>
     <arg name="rtabmapviz" value="true"/>
   </include>
+
+  <!-- octomap server -->
+	<node pkg="octomap_server" type="octomap_server_node" name="i3dr_octomap_server">
+		<param name="resolution" value="0.05" />
+		
+		<!-- fixed map frame (set to 'map' if SLAM or localization running!) -->
+		<param name="frame_id" type="string" value="scan" />
+		
+		<!-- maximum range to integrate (speedup!) -->
+		<param name="sensor_model/max_range" value="5.0" />
+		
+		<!-- data source to integrate (PointCloud2) -->
+		<remap from="cloud_in" to="$(arg camera_namespace)/points2" />
+	
+	</node>
 
 </launch>
